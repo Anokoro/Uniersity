@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head> 
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+        <title>PHP</title>
+        <meta name="keywords" content="" />
+        <meta name="description" content="" />
+        <link rel="stylesheet" type="text/css" href="http://www.sucaihuo.com/jquery/css/common.css" />
+        <style type="text/css">
+            .demo{width:400px; margin:40px auto 0 auto; min-height:250px;}
+            .demo p{line-height:30px; padding:4px}
+        </style>
+    </head>
+    <body>
+        <div class="head">
+            <div class="head_inner clearfix">
+                <ul id="nav">
+                    <li><a href="http://www.sucaihuo.com"> </a></li>
+                    <li><a href="http://www.sucaihuo.com/templates"></a></li>
+                    <li><a href="http://www.sucaihuo.com/js">งน</a></li>
+                    <li><a href="http://www.sucaihuo.com/php">PHP</a></li>
+                    <li><a href="http://www.sucaihuo.com/site"></a></li>
+                </ul>
+                <a class="logo" href="http://www.sucaihuo.com"><img src="http://www.sucaihuo.com/Public/images/logo.jpg" alt="logo" /></a>
+            </div>
+        </div>
+        <div class="container">
+            <div class="demo">
+                <h2 class="title"><a href="http://www.sucaihuo.com/js/325.html">PHP</a></h2>
+
+                <form id="reg" action="register.php" method="post" onsubmit="return chk_form();">
+                    <p><input type="text" class="input" name="username" id="user"></p>
+                    <p> &nbsp; <input type="password" class="input" name="password" id="pass"></p>
+                    <p>E-mail<input type="text" class="input" name="email" id="email"></p>
+                    <p><input type="submit" class="btn" value=""></p>
+                </form>
+            </div>
+        </div>
+        <div class="foot">
+            Powered by sucaihuo.com  <a href="http://www.sucaihuo.com" target="_blank">www.sucaihuo.com</a>
+        </div>
+        <script type="text/javascript" src="http://libs.useso.com/js/jquery/1.7.2/jquery.min.js"></script> 
+        <script type="text/javascript">
+                    function chk_form() {
+                        var user = document.getElementById("user");
+                        if (user.value == "") {
+                            alert("");
+                            return false;
+                        }
+                        var pass = document.getElementById("pass");
+                        if (pass.value == "") {
+                            alert("");
+                            return false;
+                        }
+                        var email = document.getElementById("email");
+                        if (email.value == "") {
+                            alert("Email");
+                            return false;
+                        }
+                        var preg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/; //Email
+                        if (!preg.test(email.value)) {
+                            alert("Email");
+                            return false;
+                        }
+                    }
+        </script>
+    </body>
+</html>

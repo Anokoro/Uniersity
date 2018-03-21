@@ -1,0 +1,413 @@
+
+
+
+
+
+
+
+###################################################
+使用数据库准备工作
+在oracle用户下
+
+ su - oracle
+
+ lsnrctl start    ##启动监听命令
+
+ sqlplus / as sysdba #以系统管理员(sysdba)的身份连接数据库；
+
+ startup
+
+/*实验二*/
+CREATE TABLE dept1
+(
+    no  integer not null,
+    name    varchar2(255)   not null,
+    primary key(no)
+);
+CREATE TABLE student1
+(
+    no  integer not null,
+    name    varchar2(255)   not null,
+    gender  varchar2(255)   not null,
+    age integer not null,
+    d_no    integer not null,
+    primary key(no),
+    foreign key(d_no) references dept1,
+    check (gender in ('female','male'))
+);
+
+CREATE TABLE course1
+(
+    no  integer not null,
+    name    varchar2(255)   not null,
+    credit  integer not null,
+    primary key(no)
+);
+
+
+CREATE TABLE score1
+(
+    s_no    integer not null,
+    c_no    integer not null,
+    score   integer not null,
+    foreign key(s_no) references student1,
+    foreign key(c_no) references course1
+);
+#删除列
+alter table student1 drop column age;
+#添加列
+alter table student1 add (age integer not null);
+#修改列
+alter table student1 modify (name char(15));
+#添加列
+alter table course1 add (d_no integer not null);
+#为新加的列增添约束
+alter table course1 add constraint d_no foreign key(d_no) references dept1;
+#删除表的约束
+alter table score1 drop foreign key  s_no;
+alter table score1 drop constraint s_no;
+alter table score1 drop constraint <约束名>;
+alter table score1 add constraint s_no foreign key(s_no) references student1;
+alter table score1 add constraint c_no foreign key(c_no) references course1;
+alter table score1 modify s_no not null; 
+alter table score1 modify c_no not null; 
+alter table score1 modify score not null; 
+#查找表 的约束
+select * from user_constraints where table_name='SCORE1';
+#删除表的约束
+select * from user_constraints c where c.constraint_type = 'R' and c.table_name = 'SCORE1';
+alter table score1 add constraint fk_s_no foreign key(s_no)references student1(no)；
+alter table score1 add constraint fk_c_no foreign key(c_no)references course1(no)；
+#查询建立的约束
+
+
+select table_name, constraint_type, constraint_name from user_constraints where table_name =upper('student1');
+select table_name, constraint_type, constraint_name from user_constraints where table_name =upper('dept1');
+select table_name, constraint_type, constraint_name from user_constraints where table_name =upper('course1');
+select table_name, constraint_type, constraint_name from user_constraints where table_name =upper('score1');
+
+
+/*实验三*/
+#import
+create table dept (
+    no integer primary key not null,
+    name varchar(30) not null
+);
+
+create table student (
+    no integer primary key not null,
+    name varchar(20) not null,
+    gender varchar(6) not null check (gender in ('Male','Female')),
+    age integer not null,
+    d_no integer not null, 
+    constraint st_c_1 foreign key (d_no) references dept(no)
+);
+
+create table course (
+    no integer primary key not null,
+    name varchar(20) not null,
+    credit integer not null,
+    d_no integer not null,
+    constraint co_c_1 foreign key (d_no) references dept(no)
+);
+
+create table score (
+    s_no integer not null,
+    c_no integer not null,
+    score integer not null,
+    constraint sc_c_1 foreign key (s_no) references student(no),
+    constraint sc_c_2 foreign key (c_no) references course(no)
+);
+
+insert into dept (no,name) values (1,'Computer Science');
+insert into dept (no,name) values (2,'Mathematics');
+insert into dept (no,name) values (3,'Architecture');
+insert into dept (no,name) values (4,'Management');
+
+insert into course (no,name,credit,d_no) values (1,'Database',5,1);
+insert into course (no,name,credit,d_no) values (2,'Mathematics',2,2);
+insert into course (no,name,credit,d_no) values (3,'Information System',1,4);
+insert into course (no,name,credit,d_no) values (4,'Operating System',6,1);
+insert into course (no,name,credit,d_no) values (5,'Data Structure',4,1);
+insert into course (no,name,credit,d_no) values (6,'Data Processing',2,4);
+insert into course (no,name,credit,d_no) values (7,'PASCAL',3,1);
+
+insert into student (no,name,gender,age,d_no) values (200215120,'Mike','Male',21,3);
+insert into student (no,name,gender,age,d_no) values (200215121,'Tom','Male',20,1);
+insert into student (no,name,gender,age,d_no) values (200215122,'Jerry','Female',19,1);
+insert into student (no,name,gender,age,d_no) values (200215123,'Alice','Female',18,2);
+insert into student (no,name,gender,age,d_no) values (200215125,'Bob','Male',19,3);
+
+
+insert into score (s_no,c_no,score) values (200215121,1,92);
+insert into score (s_no,c_no,score) values (200215121,2,85);
+insert into score (s_no,c_no,score) values (200215121,3,88);
+insert into score (s_no,c_no,score) values (200215122,2,90);
+insert into score (s_no,c_no,score) values (200215122,3,80);
+
+select * from student;
+select * from course;
+select * from dept;
+select * from score;
+
+
+/*实验3操作*/
+//pass
+select name,age
+    from student
+    where age < 20;
+
+//pass
+NO.2 查询选2号课程且成绩在80--90的学生号。(BETWEEN  … AND …   )
+select student.no
+    from student,score
+    where score.s_no = student.no
+        and score.c_no = 2;
+        and score.score BETWEEN  80 AND 90;
+//pass
+NO.3 查姓名第二个字母是'o'的学生姓名
+select name
+    from student 
+    where name like '_o%';
+
+//pass
+NO.4  查询全体男学生的学号、系、年龄结果按所在的系升序排列，
+同一系中的学生按年龄降序排列。
+select S.no,S.age,dept.name
+    from student S
+        inner join dept on S.d_no = dept.no
+    where S.gender = 'Male'
+    order by dept.no ASC,S.age desc;
+或者
+select S.no,S.age,D.name
+    from student S,dept D
+    where S.gender = 'Male' and S.d_no = D.no
+    order by D.no ASC,S.age desc;
+
+//pass
+NO.5  查询女学生的总人数和平均年龄。
+select count(no),avg(age)
+    from student
+    where gender = 'Female';
+
+//pass
+NO.6  查询选修3号课程并及格的学生的最高分数、最低分及总分。
+select max(score),min(score),sum(score)
+    from score
+    where c_no = 3 and score >=60;
+//pass
+NO.7  向Score表中插入一条记录（200215123,1,70）
+insert into score  values(200215123,1,70);
+
+/pass
+NO.8 求每个学生（号）的平均成绩，并将其超过80分的按学号升序输出。 
+select s_no,avg(score)
+    from score
+    group by s_no
+        having avg(score) > 80
+    order by s_no ASC;
+
+//pass
+NO.9 查询其他系中比Architecture系中年龄最小的学生年龄大的学生姓名和年
+select S.name,S.age
+    from student S,dept D
+    where S.d_no = D.no and D.name != 'Architecture'
+        and S.age >(
+            select min(age)
+            from student S1,dept D1
+            where S1.d_no = D1.no and D1.name = 'Architecture');
+
+//pass
+NO.10 查询选修了课程1或者选修了课程2的学生姓名
+select student.name 
+    from student,score
+    where (score.c_no = 1 or score.c_no=2)
+        and student.no = score.s_no;
+
+//pass 
+NO.11 查询既选修了课程1又选修了课程2的学生姓名 
+select student.name
+    from student,score s1
+    where student.no = s1.s_no and s1.c_no = 1
+        and exists (select *
+            from score s2
+            where s2.c_no = 2);
+
+//pass
+NO.12 查询选修Database这门课最高分学生所在的系名
+select dept.name
+    from dept,student,score sc1
+    where  student.d_no =dept.no 
+        and student.no = sc1.s_no
+        and sc1.c_no = 1
+        and sc1.score = (
+            select max(score)
+            from course,score sc2
+            where course.name = 'Database'
+                and course.no = sc2.c_no);
+
+//pass
+NO.13 建立一个包含学生学号，姓名，年龄，以及所在系名的视图
+（赋予列名为sno,sname,sage,deptname）
+create view newview(sno,sname,sage,deptname) AS
+    select S.no,S.name,S.age,D.name
+    from student S,dept D
+    where S.d_no = D.no;
+
+
+
+
+
+/*实验4*/
+/*1. 创建表studentABC
+
+关键字    字符类型    约束
+************************************
+Sno       varchar2(9)     primary key
+Sname     varchar2(20)    unique
+Ssex      varchar2(2)
+Sage      smallint
+Sdept     varchar2(20)
+************************************/
+create table studentABC1(
+    Sno varchar2(9) primary key,
+    Sname varchar2(20) unique,
+    Ssex varchar2(2),
+    Sage smallint,
+    Sdept varchar2(20)
+);
+
+#2. 向table studentABC插入两个元组
+insert into studentABC1 values('1552239','岳昊玮','M','21','电信学院');
+insert into studentABC1 values('1234567','隔壁老王','F','21','软件学院');
+#3. 建立用户master ，口令为key，默认表空间名为users,临时表空间名为temp
+create user master2 identified by key 
+    default tablespace users temporary tablespace temp;
+#连接用户
+conn master1/key;
+
+
+#4. 授予用户master以系统特权，包括create session、create table、create user、alter user和drop user等，并赋予其再授权的能力
+conn /as sysdba;
+grant create session,create table,create user,alter user,drop user
+    to master2;
+    with admin option;
+
+#5. 回收master的create user、alter user和drop user的系统特权
+revoke create user,alter user,drop user
+    from master1;
+#6. 在master用户下尝试查询table studentABC(注意使用sys.studentABC)
+select * from sys.studentABC1;
+
+#7. 授予用户master对表studentABC的查询、插入、修改等对象特权，并赋予其再授权的能力
+grant all privileges 
+    on studentABC1 
+    to master1 
+    with grant option;
+revoke all privileges
+    on studentABC1 
+    from master1;
+
+#8. 在master用户下查询sys.studentABC(注意使用sys.studentABC)
+select * from sys.studentABC1;
+#9. 在master用户下再插入一个元组的数据，并在master用户下查询(注意使用sys.studentABC)
+insert into sys.studentABC1 values('7654321','Iwan','F','21','CS');
+
+#10.删除今天创建的master用户
+drop user master2  cascade;
+
+
+# test6
+alter user scott identified by tiger; #修改用户scott的密码为tiger
+conn scoot/tiger
+create table target(
+    id int primary key,
+    value varchar2(200)
+);
+create table log(
+    ts timestamp not null,
+    log varchar2(500)
+);
+ALTER TRIGGER tr_in DISABLE
+
+当target表添加一条记录之后，在log表中添加一条记录：’Added one row of record.’
+create or replace trigger tr_test1
+    after insert
+    on target
+    referencing new as nrow 
+    begin
+    insert into log(ts,log) values(sysdate,'Added one row of record');
+    end;
+    /
+
+
+/*
+create or replace trigger tr_task1
+    after insert or before delete or after update 
+    on target 
+    as
+    begin
+    if inserting
+    then
+        insert into log(ts,log) values(sysdate,'Added one row of record');
+    elsif updating
+    then
+        insert into log(ts,log) values(sysdate,'record changed')
+    elsif deleting
+    then
+        insert into log(ts,log) values(sysdate,'Deleting one row of record')
+    end/
+*/
+
+测试
+insert into target(id,value) values (1,'Blah');
+当target表删除一条记录之前，在log表中添加一条记录：’Deleting one row of record’
+create or replace trigger tr_test1_2
+    before delete
+    on target
+    referencing new as nrow 
+    begin
+    insert into log(ts,log) values(sysdate,'Deleting one row of record');
+    end;
+    /
+测试
+delete from target where id=1;
+当target表中的记录被更改后，在log表中添加一条记录：’ record changed’
+create or replace trigger tr_test1_3
+    after update
+    on target
+    referencing new as nrow 
+    begin
+    insert into log(ts,log) values(sysdate,'record changed');
+    end;
+    /
+
+
+测试
+update target set value='oh yeah'  where id=1;
+
+
+create table Database_log(
+    ts timestamp not null,
+    log varchar2(500)
+);
+create or replace trigger tr_startup
+    after STARTUP on DATABASE
+    begin
+        insert into Database_log(ts,log) values(sysdate,ora_sysevent);
+    end;
+    /
+create or replace trigger tr_shutdown
+    before SHUTDOWN on DATABASE
+    begin
+        insert into Database_log values(sysdate,ora_sysevent);
+    end;
+    /
+
+
+alter  trigger tr_test1 disable;
+alter  trigger tr_test1_2 disable;
+alter  trigger tr_test1_3 disable;
+/*查看当前用户的触发器的状态*/
+select trigger_name, status from user_triggers;
+
